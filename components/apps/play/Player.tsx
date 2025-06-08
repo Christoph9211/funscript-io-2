@@ -41,9 +41,12 @@ const Player = ({
         else setScriptDuration(funscript.actions.slice(-1)[0].at / 1000);
     }, [funscript]);
 
-    const handleSeek = useCallback((time: number) => {
-        setCachedPlaybackPosition(Math.min(scriptDuration, time));
-    }, [scriptDuration]);
+    const handleSeek = useCallback(
+        (time: number) => {
+            setCachedPlaybackPosition(Math.min(scriptDuration, time));
+        },
+        [scriptDuration]
+    );
 
     useEffect(() => {
         if (!playing) setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
