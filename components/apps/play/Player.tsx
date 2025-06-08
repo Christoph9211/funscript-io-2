@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import useHandy, { HsspState } from "thehandy-react";
+import { useKeon } from "lib/hooks/useKeon";
 import { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptHeatmap from "components/molecules/FunscriptHeatmap";
@@ -18,7 +18,7 @@ const Player = ({
     prepared?: boolean;
     countdownTime?: number;
 }): JSX.Element => {
-    const { sendHsspPlay, sendHsspStop, handyState } = useHandy();
+    const { device, linear, stop } = useKeon();
 
     const [playing, setPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -41,43 +41,32 @@ const Player = ({
         else setScriptDuration(funscript.actions.slice(-1)[0].at / 1000);
     }, [funscript]);
 
-    useEffect(() => {
-        if (!prepared) {
-            return;
-        }
-        if (handyState.hsspState === HsspState.needSetup) {
-            return;
-        }
-
-        if (playing && handyState.hsspState === HsspState.stopped) {
-            sendHsspPlay(Math.round(cachedPlaybackPosition * 1000));
-        } else if (!playing && handyState.hsspState === HsspState.playing) {
-            setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
-            sendHsspStop();
-        }
-    }, [playing, prepared, handyState.hsspState, cachedPlaybackPosition]);
-
-    const handleSeek = useCallback(
-        (time: number) => {
-            if (!prepared) {
-                return;
-            }
-            if (handyState.hsspState === HsspState.needSetup) {
-                return;
-            }
-
-            if (playing && handyState.hsspState === HsspState.playing) {
-                sendHsspPlay(Math.round(time * 1000));
-            } else {
-                setCachedPlaybackPosition(Math.min(scriptDuration, time));
-            }
-        },
-        [prepared, playing, handyState.hsspState]
-    );
+    const handleSeek = useCallback((time: number) => {
+        setCachedPlaybackPosition(Math.min(scriptDuration, time));
+    }, [scriptDuration]);
 
     useEffect(() => {
         if (!playing) setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
     }, [playing, progress]);
+
+    useEffect(() => {
+        if (!device || !playing || !funscript) return;
+        const timeMs = progress * duration * 1000;
+        const actions = funscript.actions;
+        if (!actions.length) return;
+        let index = 0;
+        while (index + 1 < actions.length && timeMs >= actions[index + 1].at) {
+            index++;
+        }
+        const pos = actions[index].pos / 100;
+        const nextAt = index + 1 < actions.length ? actions[index + 1].at : actions[index].at + 100;
+        const dur = Math.max(0, nextAt - timeMs);
+        linear(pos, dur);
+    }, [device, playing, progress, duration, funscript, linear]);
+
+    useEffect(() => {
+        if (!playing) stop();
+    }, [playing, stop]);
 
     return (
         <div>

@@ -4,7 +4,7 @@ import { AppProps } from "next/dist/shared/lib/router/router";
 import React, { ReactNode } from "react";
 import NProgress from "nprogress";
 import { Slide, ToastContainer } from "react-toastify";
-import { HandyProvider } from "thehandy-react";
+import { KeonProvider } from "lib/hooks/useKeon";
 
 import "../styles/app.css";
 import "nprogress/nprogress.css";
@@ -18,7 +18,7 @@ NProgress.configure({ showSpinner: false });
 
 function MyApp({ Component, pageProps }: AppProps): ReactNode {
     return (
-        <HandyProvider verbose={false}>
+        <KeonProvider>
             <Head>
                 <title>Funscript.io</title>
             </Head>
@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }: AppProps): ReactNode {
                 autoClose={3000}
             />
             <Analytics />
-        </HandyProvider>
+        </KeonProvider>
     );
 }
 
