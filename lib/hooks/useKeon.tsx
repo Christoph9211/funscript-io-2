@@ -8,8 +8,8 @@ interface KeonContextProps {
 
 const KeonContext = createContext<KeonContextProps>({
     device: null,
-    linear: () => {},
-    stop: () => {},
+    linear: () => undefined,
+    stop: () => undefined,
 });
 
 export const KeonProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
@@ -45,13 +45,13 @@ export const KeonProvider = ({ children }: { children: React.ReactNode }): JSX.E
 
     const linear = (position: number, duration: number) => {
         if (device) {
-            device.linear(position, duration).catch(() => {});
+            device.linear(position, duration).catch(() => undefined);
         }
     };
 
     const stop = () => {
         if (device) {
-            device.stop().catch(() => {});
+            device.stop().catch(() => undefined);
         }
     };
 

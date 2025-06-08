@@ -1,6 +1,6 @@
 import React from "react";
-import { useKeon } from "lib/hooks/useKeon";
 import { MdWifiTethering, MdReport } from "react-icons/md";
+import { useKeon } from "lib/hooks/useKeon";
 
 const HeaderHandyConnection = (): JSX.Element => {
     const { device } = useKeon();

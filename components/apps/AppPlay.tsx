@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useKeon } from "lib/hooks/useKeon";
+import React, { useMemo, useState } from "react";
 import ContentDropzone, { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
 import FunscriptDropzone from "components/molecules/FunscriptDropzone";
 import TextField from "components/molecules/TextField";
 import Player from "./play/Player";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AppPlay = (): JSX.Element => {
-    const { device } = useKeon();
-
     const [content, setContent] = useState<PlayableContent | null>(null);
     const [funscript, setFunscript] = useState<Funscript | null>(null);
     const [countdownTime, setCountdownTime] = useState("");
@@ -25,12 +21,9 @@ const AppPlay = (): JSX.Element => {
         }
         return seconds;
     }, [countdownTime]);
-    const [prepared, setPrepared] = useState(false);
-
     const prepare = (_filename: string, script: Funscript) => {
         if (!script) return;
         setFunscript(script);
-        setPrepared(true);
     };
 
     const isCountdownTimeValid = (time: string) => {
@@ -53,7 +46,6 @@ const AppPlay = (): JSX.Element => {
             <Player
                 content={content}
                 funscript={funscript}
-                prepared={prepared}
                 countdownTime={countdownSeconds}
             />
             {content && (

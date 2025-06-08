@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useKeon } from "lib/hooks/useKeon";
 import { PlayableContent } from "components/molecules/ContentDropzone";
 import { Funscript } from "lib/funscript-utils/types";
@@ -10,12 +10,10 @@ import VideoPlayer from "./VideoPlayer";
 const Player = ({
     content,
     funscript,
-    prepared = false,
     countdownTime = 0,
 }: {
     content: PlayableContent | null;
     funscript: Funscript | null;
-    prepared?: boolean;
     countdownTime?: number;
 }): JSX.Element => {
     const { device, linear, stop } = useKeon();
@@ -25,7 +23,6 @@ const Player = ({
     const [duration, setDuration] = useState(0);
     const [scriptDuration, setScriptDuration] = useState(0);
     const [ended, setEnded] = useState(false);
-    const [cachedPlaybackPosition, setCachedPlaybackPosition] = useState(0);
 
     const getFunscriptPadding = () => {
         if (!funscript) return "0px";
@@ -41,16 +38,6 @@ const Player = ({
         else setScriptDuration(funscript.actions.slice(-1)[0].at / 1000);
     }, [funscript]);
 
-    const handleSeek = useCallback(
-        (time: number) => {
-            setCachedPlaybackPosition(Math.min(scriptDuration, time));
-        },
-        [scriptDuration]
-    );
-
-    useEffect(() => {
-        if (!playing) setCachedPlaybackPosition(Math.min(scriptDuration, progress * duration));
-    }, [playing, progress]);
 
     useEffect(() => {
         if (!device || !playing || !funscript) return;
@@ -83,7 +70,8 @@ const Player = ({
                     onProgress={setProgress}
                     onDuration={setDuration}
                     onSeekEnd={() => {
-                        handleSeek(progress * duration);
+                        // Nothing to do here since device position is derived
+                        // from progress/duration state.
                     }}
                 />
             )}
@@ -97,7 +85,8 @@ const Player = ({
                     onProgress={setProgress}
                     onDuration={setDuration}
                     onSeekEnd={() => {
-                        handleSeek(progress * duration);
+                        // Nothing to do here since device position is derived
+                        // from progress/duration state.
                     }}
                 />
             )}
@@ -120,10 +109,10 @@ const Player = ({
                     onDuration={setDuration}
                     onSeek={time => {
                         setProgress(time / duration);
-                        handleSeek(time);
                     }}
                     onSeekEnd={() => {
-                        handleSeek(progress * duration);
+                        // Nothing to do here since device position is derived
+                        // from progress/duration state.
                     }}
                     onEnded={() => {
                         setPlaying(false);
